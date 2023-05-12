@@ -3,6 +3,7 @@ package com.backEnd.gladyTest.dto;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.backEnd.gladyTest.exceptions.DepositExpiredExceptions;
 import com.backEnd.gladyTest.model.DepositType;
 
 public class MealDepositsDto extends DepositDto {

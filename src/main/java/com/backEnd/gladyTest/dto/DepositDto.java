@@ -57,7 +57,7 @@ public abstract class DepositDto {
 			throw new DepositExpiredExceptions("The deposit has expired");
 	}
 
-	public abstract Date calculateEndDate();
+	public abstract Date calculateEndDate() throws DepositExpiredExceptions;
 
 	@Override
 	public String toString() {

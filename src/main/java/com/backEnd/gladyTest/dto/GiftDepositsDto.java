@@ -3,12 +3,12 @@ package com.backEnd.gladyTest.dto;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.backEnd.gladyTest.exceptions.DepositExpiredExceptions;
 import com.backEnd.gladyTest.model.DepositType;
 
 public class GiftDepositsDto extends DepositDto {
 
 	public GiftDepositsDto(Date startDate, Long amount) {
-
 		this.setDepositType(DepositType.GIFT);
 		this.setAmount(amount);
 		this.setStartDate(startDate);

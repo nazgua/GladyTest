@@ -1,5 +1,6 @@
 package com.backEnd.gladyTest.mapper;
 
+import com.backEnd.gladyTest.exceptions.DepositExpiredExceptions;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -18,7 +19,7 @@ public interface DepositMapper {
     @Named("depositToDepositDto")
     @Mapping(target = "depositType", source = "depositType")
     default DepositDto depositToDepositDto(Deposit deposit)
-        throws DepositTypeDoesntExistExceptions {
+            throws DepositTypeDoesntExistExceptions {
         return DepositsFactory.getInstance().createDeposit(deposit.getDepositType(), deposit.getStartDate(), deposit.getAmount());
     }
 

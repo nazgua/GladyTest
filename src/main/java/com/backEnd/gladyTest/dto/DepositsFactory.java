@@ -2,6 +2,7 @@ package com.backEnd.gladyTest.dto;
 
 import java.util.Date;
 
+import com.backEnd.gladyTest.exceptions.DepositExpiredExceptions;
 import com.backEnd.gladyTest.exceptions.DepositTypeDoesntExistExceptions;
 import com.backEnd.gladyTest.model.DepositType;
 

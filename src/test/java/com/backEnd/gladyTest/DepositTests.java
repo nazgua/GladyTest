@@ -12,7 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import com.backEnd.gladyTest.exceptions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,10 +30,6 @@ import com.backEnd.gladyTest.dto.CompanyDto;
 import com.backEnd.gladyTest.dto.DepositDto;
 import com.backEnd.gladyTest.dto.DepositsFactory;
 import com.backEnd.gladyTest.dto.UserDto;
-import com.backEnd.gladyTest.exceptions.CompanyNotFoundException;
-import com.backEnd.gladyTest.exceptions.DepositTypeDoesntExistExceptions;
-import com.backEnd.gladyTest.exceptions.InsufficientFundsExceptions;
-import com.backEnd.gladyTest.exceptions.UserNotFoundException;
 import com.backEnd.gladyTest.mapper.CompanyMapper;
 import com.backEnd.gladyTest.mapper.DepositMapper;
 import com.backEnd.gladyTest.mapper.UserMapper;
@@ -83,6 +81,14 @@ public class DepositTests {
 			DepositDto result = depositService.distributeDeposit(1L, 1L, DepositType.GIFT, new Date(), 500L);
 		});
 	}
+	@Test
+	public void testDistribute_depositExpired_shouldThrowException() throws CompanyNotFoundException, DepositTypeDoesntExistExceptions, InsufficientFundsExceptions, UserNotFoundException {
+
+		// Call the method
+		assertThrows(DepositExpiredExceptions.class, () -> {
+			DepositDto result = depositService.distributeDeposit(1L, 1L, DepositType.GIFT, getDate("06/14/2022"), 500L);
+		});
+	}
 
 	@Test
 	public void testDistribute_coherentDistribution_shouldReturnSuccess() throws Exception {
@@ -108,9 +114,8 @@ public class DepositTests {
 		assertEquals(expectedCompanyBalance, companyDto.getBalance().longValue());
 
 	}
-
 	@Test
-	public void testEndDateCalculationForGiftDeposit() throws DepositTypeDoesntExistExceptions {
+	public void testEndDateCalculationForGiftDeposit() throws DepositTypeDoesntExistExceptions, DepositExpiredExceptions {
 		Date startDate = getDate("06/15/2021");
 		DepositsFactory depositsFactory = DepositsFactory.getInstance();
 		DepositDto depositGiftDto = depositsFactory.createDeposit(DepositType.GIFT, startDate, 1L);
@@ -121,7 +126,7 @@ public class DepositTests {
 	}
 
 	@Test
-	public void testEndDateCalculationForMealDeposit() throws DepositTypeDoesntExistExceptions {
+	public void testEndDateCalculationForMealDeposit() throws DepositTypeDoesntExistExceptions, DepositExpiredExceptions {
 		Date startDate = getDate("01/01/2020");
 		DepositsFactory depositsFactory = DepositsFactory.getInstance();
 		DepositDto depositMealDto = depositsFactory.createDeposit(DepositType.MEAL, startDate, 1L);

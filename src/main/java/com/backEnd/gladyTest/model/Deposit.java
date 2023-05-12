@@ -56,7 +56,12 @@ public class Deposit {
 		else
 			throw new DepositExpiredExceptions("The deposit has expired");
 	}
-
+	public Deposit(DepositType depositType, Date startDate, Long amount, Date endDate) {
+		this.depositType = depositType;
+		this.startDate = startDate;
+		this.amount = amount;
+		this.endDate = endDate;
+	}
 	@Override
 	public String toString() {
 

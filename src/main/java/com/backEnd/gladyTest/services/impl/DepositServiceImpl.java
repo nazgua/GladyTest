@@ -3,6 +3,7 @@ package com.backEnd.gladyTest.services.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.backEnd.gladyTest.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,6 @@ import com.backEnd.gladyTest.dto.CompanyDto;
 import com.backEnd.gladyTest.dto.DepositDto;
 import com.backEnd.gladyTest.dto.DepositsFactory;
 import com.backEnd.gladyTest.dto.UserDto;
-import com.backEnd.gladyTest.exceptions.CompanyNotFoundException;
-import com.backEnd.gladyTest.exceptions.DepositTypeDoesntExistExceptions;
-import com.backEnd.gladyTest.exceptions.InsufficientFundsExceptions;
-import com.backEnd.gladyTest.exceptions.UserNotFoundException;
 import com.backEnd.gladyTest.mapper.DepositMapper;
 import com.backEnd.gladyTest.model.Deposit;
 import com.backEnd.gladyTest.model.DepositType;
@@ -53,8 +50,10 @@ public class DepositServiceImpl implements DepositService {
 	@Override
 	public DepositDto distributeDeposit(Long companyId, Long userId, Enum<DepositType> type, Date startDate,
 			Long amount) throws DepositTypeDoesntExistExceptions, CompanyNotFoundException, InsufficientFundsExceptions,
-			UserNotFoundException {
-
+			UserNotFoundException, DepositExpiredExceptions {
+		if(startDate.before(new Date())){
+			throw new DepositExpiredExceptions("The start date msut be after or equals to the date of today");
+		}
 		CompanyDto companyDto = companyService.findCompanyDtoById(companyId);
 		if (companyDto.getBalance() < amount) {
 			throw new InsufficientFundsExceptions("There are no funds available for this amount of deposit");
