@@ -8,9 +8,9 @@ import com.backEnd.gladyTest.exceptions.UserNotFoundException;
 import com.backEnd.gladyTest.mapper.UserMapper;
 import com.backEnd.gladyTest.model.DepositType;
 import com.backEnd.gladyTest.repositoriesImpl.UserRepositoryImpl;
-import com.backEnd.gladyTest.services.DepositService;
 import com.backEnd.gladyTest.services.UserService;
 import com.backEnd.gladyTest.services.impl.UserServiceImpl;
+import com.backEnd.gladyTest.utils.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class UserTests {
@@ -31,9 +34,6 @@ public class UserTests {
 
     @Mock
     private UserService userService;
-
-//    @Mock
-//    private DepositService distributeService;
 
     @InjectMocks
     private UserRepositoryImpl userRepository;
@@ -49,14 +49,18 @@ public class UserTests {
     @Test
     public void testUserDepositAmountShouldSuccess() throws UserNotFoundException, DepositTypeDoesntExistExceptions {
         UserDto userDto = userService.findById(1L);
-        DepositDto firstDepositDto = DepositsFactory.getInstance().createDeposit(DepositType.MEAL, new Date(), 200L);
-        DepositDto secondDepositDto = DepositsFactory.getInstance().createDeposit(DepositType.MEAL, new Date(), 200L);
+        DepositDto firstDepositDto = DepositsFactory.getInstance().createDeposit(DepositType.GIFT, DateUtils.parseDate("02/28/2023"), 100L);
+        DepositDto secondDepositDto = DepositsFactory.getInstance().createDeposit(DepositType.MEAL, DateUtils.parseDate("02/28/2023"), 200L);
         userDto.getDepositsDto().add(firstDepositDto);
         userDto.getDepositsDto().add(secondDepositDto);
 
-        userService.updateUser(userDto);
+        UserDto updatedUserDto = userService.updateUser(userDto);
 
-        log.info(userService.getUserDepositAmount(1L).toString());
+        Map<DepositType, Long> result = userService.getUserDepositAmount(updatedUserDto.getId());
 
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals(100L, result.get(DepositType.GIFT));
+        assertEquals(200L, result.get(DepositType.MEAL));
     }
 }

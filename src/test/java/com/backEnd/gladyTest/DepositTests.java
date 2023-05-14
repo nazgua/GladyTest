@@ -1,20 +1,18 @@
 package com.backEnd.gladyTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import com.backEnd.gladyTest.dto.CompanyDto;
+import com.backEnd.gladyTest.dto.DepositDto;
+import com.backEnd.gladyTest.dto.DepositsFactory;
+import com.backEnd.gladyTest.dto.UserDto;
 import com.backEnd.gladyTest.exceptions.*;
+import com.backEnd.gladyTest.mapper.DepositMapper;
+import com.backEnd.gladyTest.model.DepositType;
+import com.backEnd.gladyTest.repositoriesImpl.DepositRepositoryImpl;
+import com.backEnd.gladyTest.services.CompanyService;
+import com.backEnd.gladyTest.services.DepositService;
+import com.backEnd.gladyTest.services.UserService;
+import com.backEnd.gladyTest.services.impl.DepositServiceImpl;
+import com.backEnd.gladyTest.utils.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,23 +24,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.backEnd.gladyTest.dto.CompanyDto;
-import com.backEnd.gladyTest.dto.DepositDto;
-import com.backEnd.gladyTest.dto.DepositsFactory;
-import com.backEnd.gladyTest.dto.UserDto;
-import com.backEnd.gladyTest.mapper.CompanyMapper;
-import com.backEnd.gladyTest.mapper.DepositMapper;
-import com.backEnd.gladyTest.mapper.UserMapper;
-import com.backEnd.gladyTest.model.DepositType;
-import com.backEnd.gladyTest.repositoriesImpl.CompanyRepositoryImpl;
-import com.backEnd.gladyTest.repositoriesImpl.DepositRepositoryImpl;
-import com.backEnd.gladyTest.repositoriesImpl.UserRepositoryImpl;
-import com.backEnd.gladyTest.services.CompanyService;
-import com.backEnd.gladyTest.services.DepositService;
-import com.backEnd.gladyTest.services.UserService;
-import com.backEnd.gladyTest.services.impl.CompanyServiceImpl;
-import com.backEnd.gladyTest.services.impl.DepositServiceImpl;
-import com.backEnd.gladyTest.services.impl.UserServiceImpl;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DepositTests {
@@ -86,7 +73,7 @@ public class DepositTests {
 
 		// Call the method
 		assertThrows(DepositExpiredExceptions.class, () -> {
-			DepositDto result = depositService.distributeDeposit(1L, 1L, DepositType.GIFT, getDate("06/14/2022"), 500L);
+			DepositDto result = depositService.distributeDeposit(1L, 1L, DepositType.GIFT, DateUtils.parseDate("06/14/2022"), 500L);
 		});
 	}
 
@@ -116,23 +103,23 @@ public class DepositTests {
 	}
 	@Test
 	public void testEndDateCalculationForGiftDeposit() throws DepositTypeDoesntExistExceptions, DepositExpiredExceptions {
-		Date startDate = getDate("06/15/2021");
+		Date startDate = DateUtils.parseDate("06/15/2021");
 		DepositsFactory depositsFactory = DepositsFactory.getInstance();
 		DepositDto depositGiftDto = depositsFactory.createDeposit(DepositType.GIFT, startDate, 1L);
 
 		// Calculate the expected end date
-		Date expectedGiftEndDate = getDate("06/14/2022");
+		Date expectedGiftEndDate = DateUtils.parseDate("06/14/2022");
 		assertEquals(expectedGiftEndDate, depositGiftDto.getEndDate());
 	}
 
 	@Test
 	public void testEndDateCalculationForMealDeposit() throws DepositTypeDoesntExistExceptions, DepositExpiredExceptions {
-		Date startDate = getDate("01/01/2020");
+		Date startDate = DateUtils.parseDate("01/01/2020");
 		DepositsFactory depositsFactory = DepositsFactory.getInstance();
 		DepositDto depositMealDto = depositsFactory.createDeposit(DepositType.MEAL, startDate, 1L);
 
 		// Calculate the expected end date
-		Date expectedMealEndDate = getDate("02/28/2021");
+		Date expectedMealEndDate = DateUtils.parseDate("02/28/2021");
 		assertEquals(expectedMealEndDate, depositMealDto.getEndDate());
 	}
 
@@ -141,16 +128,8 @@ public class DepositTests {
 		// Assert that the exception is thrown
 		assertThrows(DepositTypeDoesntExistExceptions.class, () -> {
 			DepositsFactory depositsFactory = DepositsFactory.getInstance();
-			depositsFactory.createDeposit(DepositType.INVALID_TYPE, getDate("02/28/2021"), 1L);
+			depositsFactory.createDeposit(DepositType.INVALID_TYPE, DateUtils.parseDate("02/28/2021"), 1L);
 		});
 	}
 
-	private Date getDate(String dateString) {
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-		try {
-			return formatter.parse(dateString);
-		} catch (ParseException e) {
-			throw new RuntimeException("Failed to parse date: " + dateString, e);
-		}
-	}
 }

@@ -21,6 +21,7 @@ public interface UserMapper {
 
 	@Mapping(source = "deposits", target = "depositsDto")
 	UserDto userToUserDto(User user);
+
 	default List<DepositDto> mapDepositsList(List<Deposit> deposits) {
 		return deposits.stream()
 				.map(this::mapDeposit)
@@ -35,18 +36,7 @@ public interface UserMapper {
 		return null;
 	}
 
-
 	@Mapping(source = "depositsDto", target = "deposits")
 	User userDtoToUser(UserDto userDto);
-	default List<Deposit> mapDepositsDtoList(List<DepositDto> depositsDto) {
-		return depositsDto.stream()
-				.map(this::mapDepositDto)
-				.collect(Collectors.toList());
-	}
 
-	default Deposit mapDepositDto(DepositDto depositDto) {
-		Deposit deposit = new Deposit(depositDto.getDepositType(), depositDto.getStartDate(), depositDto.getAmount(), depositDto.getEndDate());
-		return deposit;
-
-	}
 }
