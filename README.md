@@ -1,2 +1,0 @@
-# GladyTest
-Test Glady Bakcend
